@@ -1,6 +1,7 @@
 package co.id.implementation.test.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,9 +37,15 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User findById(Long id) {
+	public Optional<User> findById(Long id) {
 		// TODO Auto-generated method stub
-		return this.userRepository.findById(id).get();
+		return this.userRepository.findById(id);
+	}
+
+	@Override
+	public void deleteUser(Long id) {
+		// TODO Auto-generated method stub
+		this.userRepository.deleteById(id);
 	}
 
 }

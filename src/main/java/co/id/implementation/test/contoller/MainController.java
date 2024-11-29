@@ -1,6 +1,7 @@
 package co.id.implementation.test.contoller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -116,14 +118,14 @@ public class MainController {
 		String result = "";
 		try {
 			
-			User checkUser = this.userService.findById(body.getId());
+			Optional<User> checkUser = this.userService.findById(body.getId());
 			
-			if (checkUser != null) {
+			if (checkUser.isPresent()) {
 				User checkUserByUsername = this.userService.findByUsername(body.getUsername());
 				if(checkUserByUsername != null && checkUserByUsername.getId() != body.getId()) {
 					response.setStatusCode(409);
 					response.setMessage("Username sudah terpakai");
-				} else if(checkUser.getPassword().equalsIgnoreCase(body.getPassword())) {
+				} else if(checkUser.get().getPassword().equalsIgnoreCase(body.getPassword())) {
 					response.setStatusCode(400);
 					response.setMessage("Password tidak boleh sama dengan password sebelumnya");	
 				} else {
@@ -131,6 +133,34 @@ public class MainController {
 					response.setStatusCode(201);
 					response.setMessage("data berhasil diupdate");
 				}
+			} else {
+				response.setStatusCode(404);
+				response.setMessage("user tidak ditemukan.");
+			}
+			result = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
+			
+		} catch (Exception e){
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<String>(result, HttpStatus.OK);
+	}
+	
+	@PutMapping(path = "/delete/{id}")
+	public ResponseEntity<String> deleteUser(@RequestParam("id") Long id){
+		ObjectMapper mapper = new ObjectMapper();
+		MetaData response = new MetaData();
+		String result = "";
+		try {
+			Optional<User> checkUser = this.userService.findById(id);
+			
+			if (checkUser.isPresent()) {
+				this.userService.deleteUser(id);
+				response.setStatusCode(201);
+				response.setMessage("data berhasil dihapus.");
+			} else {
+				response.setStatusCode(404);
+				response.setMessage("user tidak ditemukan.");
 			}
 			result = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
 			

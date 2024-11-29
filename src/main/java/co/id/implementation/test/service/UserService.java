@@ -1,6 +1,7 @@
 package co.id.implementation.test.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,8 @@ public interface UserService {
 	
 	public void saveUser(User user);
 	public User findByUsername(String username);
-	public User findById(Long id);
+	public Optional<User> findById(Long id);
 	public List<User> getListUsers();
+	public void deleteUser(Long id);
 
 }
